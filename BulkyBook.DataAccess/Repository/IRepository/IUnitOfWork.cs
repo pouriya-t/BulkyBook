@@ -20,6 +20,12 @@ namespace BulkyBook.DataAccess.Repository.IRepository
 
         ISP_Call SP_Call { get; }
 
+        IShoppingCartRepository ShoppingCart { get; }
+
+        IOrderHeaderRepository OrderHeader { get; }
+
+        IOrderDetailsRepository OrderDetails { get; }
+
         void Save();
     }
 }
