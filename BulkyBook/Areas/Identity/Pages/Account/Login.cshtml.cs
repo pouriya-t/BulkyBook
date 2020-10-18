@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using BulkyBook.DataAccess.Repository.IRepository;
+using Microsoft.AspNetCore.Http;
+using BulkyBook.Utility;
 
 namespace BulkyBook.Areas.Identity.Pages.Account
 {
@@ -20,11 +23,14 @@ namespace BulkyBook.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, 
+        public LoginModel(SignInManager<IdentityUser> signInManager,
             ILogger<LoginModel> logger,
-            UserManager<IdentityUser> userManager)
+            UserManager<IdentityUser> userManager,
+            IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
@@ -40,11 +46,17 @@ namespace BulkyBook.Areas.Identity.Pages.Account
         [TempData]
         public string ErrorMessage { get; set; }
 
+        public bool ShowResend { get; set; }
+
+        public string UserId { get; set; }
+
         public class InputModel
         {
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+
+            public string UserName { get; set; }
 
             [Required]
             [DataType(DataType.Password)]
@@ -52,6 +64,8 @@ namespace BulkyBook.Areas.Identity.Pages.Account
 
             [Display(Name = "Remember me?")]
             public bool RememberMe { get; set; }
+
+          
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -82,6 +96,12 @@ namespace BulkyBook.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    var user = _unitOfWork.ApplicationUser.GetFirstOrDefault(u => u.Email == Input.Email);
+
+                    int count = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == user.Id).Count();
+
+                    HttpContext.Session.SetInt32(SD.ssShoppingCart, count);
+
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
@@ -93,6 +113,15 @@ namespace BulkyBook.Areas.Identity.Pages.Account
                 {
                     _logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
+                }
+                if (result.IsNotAllowed)
+                {
+                    _logger.LogWarning("User email is not confirmed.");
+                    ModelState.AddModelError(string.Empty, "Email is not confirmed.");
+                    var user = await _userManager.FindByNameAsync(Input.Email);
+                    UserId = user.Id;
+                    ShowResend = true;
+                    return Page();
                 }
                 else
                 {

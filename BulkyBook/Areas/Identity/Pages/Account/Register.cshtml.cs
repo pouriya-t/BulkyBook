@@ -11,7 +11,7 @@ using BulkyBook.Utility;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
+//using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -71,6 +71,8 @@ namespace BulkyBook.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
+            [Display(Name = "Login Name")]
+            public string UserName { get; set; }
 
             [Required]
             public string Name { get; set; }
@@ -194,8 +196,9 @@ namespace BulkyBook.Areas.Identity.Pages.Account
                     {
                         if (user.Role == null)
                         {
-                            await _signInManager.SignInAsync(user, isPersistent: false);
-                            return LocalRedirect(returnUrl);
+                            //await _signInManager.SignInAsync(user, isPersistent: false);
+                            //return LocalRedirect(returnUrl);
+                            return RedirectToPage("./CheckEmail");
                         }
                         else
                         {

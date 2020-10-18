@@ -4,4 +4,34 @@
     ViewData["Title"] = "Confirm email";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div asp-validation-summary="All" class="text-danger"></div>
+
+@{
+    if (Model.ShowInvalid)
+    {
+
+
+        <p>
+            Error confirming your email.
+
+
+
+
+
+            If you can login, try updating your email again.
+            If you cannot login, try resend verification.
+        </p>
+
+
+
+    }
+    else
+    {
+
+
+        <p>Thank you for confirming your email.</p>
+
+
+
+    }
+}
