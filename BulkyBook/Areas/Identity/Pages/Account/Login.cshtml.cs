@@ -46,9 +46,9 @@ namespace BulkyBook.Areas.Identity.Pages.Account
         [TempData]
         public string ErrorMessage { get; set; }
 
-        public bool ShowResend { get; set; }
+        //public bool ShowResend { get; set; }
 
-        public string UserId { get; set; }
+        //public string UserId { get; set; }
 
         public class InputModel
         {
@@ -114,15 +114,15 @@ namespace BulkyBook.Areas.Identity.Pages.Account
                     _logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
-                if (result.IsNotAllowed)
-                {
-                    _logger.LogWarning("User email is not confirmed.");
-                    ModelState.AddModelError(string.Empty, "Email is not confirmed.");
-                    var user = await _userManager.FindByNameAsync(Input.Email);
-                    UserId = user.Id;
-                    ShowResend = true;
-                    return Page();
-                }
+                //if (result.IsNotAllowed)
+                //{
+                //    _logger.LogWarning("User email is not confirmed.");
+                //    ModelState.AddModelError(string.Empty, "Email is not confirmed.");
+                //    var user = await _userManager.FindByNameAsync(Input.Email);
+                //    UserId = user.Id;
+                //    ShowResend = true;
+                //    return Page();
+                //}
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");

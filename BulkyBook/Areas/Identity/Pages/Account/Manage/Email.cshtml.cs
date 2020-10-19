@@ -31,9 +31,11 @@ namespace BulkyBook.Areas.Identity.Pages.Account.Manage
 
         public string Username { get; set; }
 
-        public string Email { get; set; }
 
         public bool IsEmailConfirmed { get; set; }
+
+        public string Email { get; set; }
+        
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -41,18 +43,27 @@ namespace BulkyBook.Areas.Identity.Pages.Account.Manage
         [BindProperty]
         public InputModel Input { get; set; }
 
+        public string UserId { get; set; }
+
         public class InputModel
         {
             [Required]
             [EmailAddress]
             [Display(Name = "New email")]
             public string NewEmail { get; set; }
+
+            public bool ShowResend { get; set; }
+
+            public string UserName { get; set; }
         }
 
         private async Task LoadAsync(IdentityUser user)
         {
             var email = await _userManager.GetEmailAsync(user);
+            var userId = await _userManager.FindByNameAsync(email);
+
             Email = email;
+            UserId = userId.Id;
 
             Input = new InputModel
             {
@@ -91,21 +102,25 @@ namespace BulkyBook.Areas.Identity.Pages.Account.Manage
             var email = await _userManager.GetEmailAsync(user);
             if (Input.NewEmail != email)
             {
-                var userId = await _userManager.GetUserIdAsync(user);
-                var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
-                var callbackUrl = Url.Page(
-                    "/Account/ConfirmEmailChange",
-                    pageHandler: null,
-                    values: new { userId = userId, email = Input.NewEmail, code = code },
-                    protocol: Request.Scheme);
-                await _emailSender.SendEmailAsync(
-                    Input.NewEmail,
-                    "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                //var userId = await _userManager.GetUserIdAsync(user);
+                //var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
+                //var callbackUrl = Url.Page(
+                //    "/Account/ConfirmEmailChange",
+                //    pageHandler: null,
+                //    values: new { userId = userId, email = Input.NewEmail, code = code },
+                //    protocol: Request.Scheme);
+                //await _emailSender.SendEmailAsync(
+                //    Input.NewEmail,
+                //    "Confirm your email",
+                //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                StatusMessage = "Confirmation link to change email sent. Please check your email.";
-                return RedirectToPage();
+                //StatusMessage = "Confirmation link to change email sent. Please check your email.";
+                //return RedirectToPage();
+                
             }
+
+
+
 
             StatusMessage = "Your email is unchanged.";
             return RedirectToPage();
@@ -124,6 +139,15 @@ namespace BulkyBook.Areas.Identity.Pages.Account.Manage
                 await LoadAsync(user);
                 return Page();
             }
+
+            //if (!user.EmailConfirmed)
+            //{
+            //    ModelState.AddModelError(string.Empty, "Email is not confirmed.");
+            //    user = await _userManager.FindByNameAsync(Email);
+            //    UserId = "hello world";
+            //    ShowResend = true;
+            //    return Page();
+            //}
 
             var userId = await _userManager.GetUserIdAsync(user);
             var email = await _userManager.GetEmailAsync(user);

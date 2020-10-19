@@ -1,41 +1,49 @@
 ﻿@page "{userId}"
- 
+
 @model BulkyBook.Areas.Identity.Pages.Account.UnconfirmedEmailModel
 @{
-    ViewData["Title"] = "UnconfirmedEmail";
+    ViewData["Title"] = "Unconfirmed Email";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>@ViewData["Title"]</h2>
 
 
-<h4>Enter your email.</h4>
-
-
-<hr />
 
 
 
-<div class="row">
+@if (!Model.isConfirmed)
+{
 
-    <div class="col-md-4">
+    <h4>Enter your email.</h4>
 
-        <form method="post">
+    <hr />
 
-            <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="row">
 
-            <div class="form-group">
-                <label asp-for="Input.Email"></label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
+        <div class="col-md-4">
 
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+            <form method="post">
+
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="form-group">
+                    <label asp-for="Input.Email"></label>
+                    <input asp-for="Input.Email" class="form-control" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+
+        </div>
 
     </div>
-
-</div>
+}
+else
+{
+    <p class="text-primary">Your account has been confirmed . </p>
+}
 
 
 

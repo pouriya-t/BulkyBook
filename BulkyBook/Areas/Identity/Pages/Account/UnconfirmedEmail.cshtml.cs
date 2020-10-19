@@ -27,6 +27,8 @@ namespace BulkyBook.Areas.Identity.Pages.Account
         [TempData]
         public Guid UserId { get; set; }
 
+        public bool isConfirmed { get; set; }
+
         [BindProperty(SupportsGet = true)]
         public InputModel Input { get; set; }
 
@@ -42,6 +44,14 @@ namespace BulkyBook.Areas.Identity.Pages.Account
             UserId = userId;
             var user = await _userManager.FindByIdAsync(userId.ToString());
             Input.Email = user.Email;
+            if (user.EmailConfirmed)
+            {
+                isConfirmed = true;
+            }
+            else
+            {
+                isConfirmed = false;
+            }
             ModelState.Clear();
         }
 
