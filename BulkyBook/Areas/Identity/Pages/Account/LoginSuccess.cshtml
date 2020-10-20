@@ -1,0 +1,14 @@
+﻿@page
+@model BulkyBook.Areas.Identity.Pages.Account.LoginSuccessModel
+
+@{
+    ViewData["Title"] = "Login Success";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="col-10 text-center text-success">
+    Your account has been created
+    <a class="btn btn-primary text-white" asp-page="./Login">Click Here To Login</a>
+</div>

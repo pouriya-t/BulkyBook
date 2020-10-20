@@ -14,6 +14,7 @@ using BulkyBook.Utility;
 using BulkyBook.Models;
 using Stripe;
 using BulkyBook.Utility.EmailService;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace BulkyBook
 {
@@ -52,8 +53,11 @@ namespace BulkyBook
             services.Configure<EmailConfiguration>(Configuration.GetSection("EmailConfiguration"));
 
             services.AddSingleton<IEmailSender, EmailSender>();
+            services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 
             services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
+
+            services.Configure<TwilioSettings>(Configuration.GetSection("Twilio"));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddControllersWithViews();

@@ -42,7 +42,7 @@
                         </div>
                         <div class="py-2">
                             <input asp-for="Input.StreetAddress" placeholder="Street Address" class="form-control" />
-                            <span asp-validation-for="Input.Name" class="text-danger"></span>
+                            <span asp-validation-for="Input.StreetAddress" class="text-danger"></span>
                         </div>
                         <div class="py-2">
                             <input asp-for="Input.City" placeholder="City" class="form-control" />
@@ -68,7 +68,7 @@
                                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                             </div>
                         </div>
-                        @if (User.IsInRole(SD.Role_Admin))
+                        @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
                         {
                             <div class="form-group">
                                 <label asp-for="Input.Role"></label>
