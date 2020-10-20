@@ -15,6 +15,7 @@ using BulkyBook.Models;
 using Stripe;
 using BulkyBook.Utility.EmailService;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using BulkyBook.DataAccess.Initializer;
 
 namespace BulkyBook
 {
@@ -60,6 +61,7 @@ namespace BulkyBook
             services.Configure<TwilioSettings>(Configuration.GetSection("Twilio"));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IDbInitializer, DbInitializer>();
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.ConfigureApplicationCookie(options =>
@@ -87,7 +89,7 @@ namespace BulkyBook
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,IDbInitializer dbInitializer)
         {
             if (env.IsDevelopment())
             {
@@ -109,6 +111,7 @@ namespace BulkyBook
 
             app.UseAuthentication();
             app.UseAuthorization();
+            dbInitializer.Initialize();
 
             app.UseEndpoints(endpoints =>
             {
