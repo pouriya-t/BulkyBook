@@ -9,6 +9,7 @@ using BulkyBook.DataAccess.Repository.IRepository;
 using BulkyBook.Models;
 using BulkyBook.Models.ViewModels;
 using BulkyBook.Utility;
+using BulkyBook.Utility.EmailService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 //using Microsoft.AspNetCore.Identity.UI.Services;

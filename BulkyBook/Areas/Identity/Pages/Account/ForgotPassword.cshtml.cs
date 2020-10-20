@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
+//using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using BulkyBook.Utility.EmailService;
 
 namespace BulkyBook.Areas.Identity.Pages.Account
 {
@@ -25,6 +26,10 @@ namespace BulkyBook.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
+
+
+
+
         [BindProperty]
         public InputModel Input { get; set; }
 
@@ -37,34 +42,55 @@ namespace BulkyBook.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByEmailAsync(Input.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-                {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToPage("./ForgotPasswordConfirmation");
-                }
 
-                // For more information on how to enable account confirmation and password reset please 
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                var callbackUrl = Url.Page(
-                    "/Account/ResetPassword",
-                    pageHandler: null,
-                    values: new { area = "Identity", code },
-                    protocol: Request.Scheme);
+            if (!ModelState.IsValid)
+                return Page();
 
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
+            var user = await _userManager.FindByEmailAsync(Input.Email);
+            if (user == null)
                 return RedirectToPage("./ForgotPasswordConfirmation");
-            }
 
-            return Page();
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            //var callback = Url.Page("/Account/ResetPassword", "Account", new { token, email = user.Email }, Request.Scheme);
+            var callback = Url.Page("/Account/ResetPassword", "Account", new { token, email = user.Email }, Request.Scheme);
+            callback = $"Please click to reset password <a href='{callback}' > clicking here </a>.";
+
+            var message = new Message(new string[] { user.Email }, "Reset password token", callback, null);
+            //await _emailSender.SendEmailAsync(message);
+            await _emailSender.SendEmailAsync(message);
+
+            return RedirectToPage("./ForgotPasswordConfirmation");
+
+
+
+            //if (ModelState.IsValid)
+            //{
+            //    var user = await _userManager.FindByEmailAsync(Input.Email);
+            //    if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            //    {
+            //        // Don't reveal that the user does not exist or is not confirmed
+            //        return RedirectToPage("./ForgotPasswordConfirmation");
+            //    }
+
+            //    // For more information on how to enable account confirmation and password reset please 
+            //    // visit https://go.microsoft.com/fwlink/?LinkID=532713
+            //    var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            //    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            //    var callbackUrl = Url.Page(
+            //        "/Account/ResetPassword",
+            //        pageHandler: null,
+            //        values: new { area = "Identity", code },
+            //        protocol: Request.Scheme);
+
+            //    await _emailSender.SendEmailAsync(
+            //        Input.Email,
+            //        "Reset Password",
+            //        $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+            //    return RedirectToPage("./ForgotPasswordConfirmation");
+            //}
+
+            //return Page();
         }
     }
 }

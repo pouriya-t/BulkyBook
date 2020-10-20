@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
-using BulkyBook.Utility;
+using BulkyBook.Utility.EmailService;
 
 namespace BulkyBook.Areas.Identity.Pages.Account
 {
@@ -24,7 +24,7 @@ namespace BulkyBook.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
-        [TempData]
+        [BindProperty]
         public Guid UserId { get; set; }
 
         public bool isConfirmed { get; set; }
@@ -37,6 +37,7 @@ namespace BulkyBook.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+
         }
 
         public async Task OnGetAsync(Guid userId)

@@ -1,12 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +13,7 @@ using BulkyBook.DataAccess.Repository;
 using BulkyBook.Utility;
 using BulkyBook.Models;
 using Stripe;
+using BulkyBook.Utility.EmailService;
 
 namespace BulkyBook
 {
@@ -49,7 +45,12 @@ namespace BulkyBook
             .AddDefaultTokenProviders();
 
             services.AddOptions();
-            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+            var emailConfig = Configuration
+                .GetSection("EmailConfiguration")
+                .Get<EmailConfiguration>();
+            services.AddSingleton(emailConfig);
+            services.Configure<EmailConfiguration>(Configuration.GetSection("EmailConfiguration"));
+
             services.AddSingleton<IEmailSender, EmailSender>();
 
             services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));

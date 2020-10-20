@@ -41,50 +41,79 @@ namespace BulkyBook.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            public string Code { get; set; }
+            public string Token { get; set; }
         }
 
-        public IActionResult OnGet(string code = null)
+        public IActionResult OnGet(string token,string email)
         {
-            if (code == null)
+            //if (code == null)
+            //{
+            //    return BadRequest("A code must be supplied for password reset.");
+            //}
+            //else
+            //{
+            //    Input = new InputModel
+            //    {
+            //        Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
+            //    };
+            //    return Page();
+            Input = new InputModel
             {
-                return BadRequest("A code must be supplied for password reset.");
-            }
-            else
-            {
-                Input = new InputModel
-                {
-                    Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
-                };
-                return Page();
-            }
+                Token = token,
+                Email = email
+            };
+
+            //}
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+
+
             if (!ModelState.IsValid)
-            {
                 return Page();
-            }
 
             var user = await _userManager.FindByEmailAsync(Input.Email);
             if (user == null)
-            {
-                // Don't reveal that the user does not exist
                 return RedirectToPage("./ResetPasswordConfirmation");
+
+            var resetPassResult = await _userManager.ResetPasswordAsync(user, Input.Token, Input.Password);
+            if (!resetPassResult.Succeeded)
+            {
+                foreach (var error in resetPassResult.Errors)
+                {
+                    ModelState.TryAddModelError(error.Code, error.Description);
+                }
+
+                return Page();
             }
 
-            var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToPage("./ResetPasswordConfirmation");
-            }
+            return RedirectToPage("./ResetPasswordConfirmation");
 
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-            return Page();
+            //if (!ModelState.IsValid)
+            //{
+            //    return Page();
+            //}
+
+            //var user = await _userManager.FindByEmailAsync(Input.Email);
+            //if (user == null)
+            //{
+            //    // Don't reveal that the user does not exist
+            //    return RedirectToPage("./ResetPasswordConfirmation");
+            //}
+
+            //var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
+            //if (result.Succeeded)
+            //{
+            //    return RedirectToPage("./ResetPasswordConfirmation");
+            //}
+
+            //foreach (var error in result.Errors)
+            //{
+            //    ModelState.AddModelError(string.Empty, error.Description);
+            //}
+            //return Page();
         }
     }
 }
